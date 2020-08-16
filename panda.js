@@ -1,5 +1,6 @@
 const http = require('http')
 const { parse } = require('querystring');
+const axios = require('axios');
 
 const server = http.createServer(function(request, response) {
   console.dir(request.param)
@@ -18,18 +19,64 @@ const server = http.createServer(function(request, response) {
   //   })
   // }
 
-  if (req.method === 'POST') {
+  if (request.method === 'POST') {
     let body = '';
-    req.on('data', chunk => {
+    request.on('data', chunk => {
         body += chunk.toString();
     });
-    req.on('end', () => {
+    request.on('end', () => {
         console.log(
             parse(body)
         );
-        res.end('ok');
+        Resend(parse(body));
+        response.end('ok');
     });
-}
+
+    function Resend(data){
+      let url = "https://chatapi.viber.com/pa/broadcast_message";
+      var mainMessage
+
+      if(data.selfvinos===true){
+        mainMessage = `${data.total_price}(грн) | ${data.products} | Тел: ${data.telephone} |  Доставка : ${data.input_address}, ${data.input_city}, ${data.input_state} | ${data.notcall} -> ${data.security}`;
+      }else{
+        mainMessage = `Kліент забире сам: ${data.total_price}(грн) | ${data.products} | Тел: ${data.telephone} | ${data.notcall} | -> ${data.security}`;
+      }
+
+      var currentdate = new Date();
+      var datetime = "Замовлення: " + currentdate.getDate() + "/"
+                + (currentdate.getMonth()+1)  + "/"
+                + currentdate.getFullYear() + " @ "
+                + currentdate.getHours() + ":"
+                + currentdate.getMinutes() + ":"
+                + currentdate.getSeconds();
+      let formattedDate = datetime;
+
+      var dataSend = {
+        auth_token:"",
+         receiver: "GoHi3E4bJK5s1Ldhx24eLQ==",
+         min_api_version":1,
+         sender:{
+            name:"sushiPanda",
+            avatar:"https://sushipandabc.com.ua/img/logo.png"
+         },
+         broadcast_list:[
+           'GoHi3E4bJK5s1Ldhx24eLQ==',
+           'R53lvkCxW/FA2N0VpXKbfg==',
+           'OrXITjUgTWZueKxjpTy9yA==',
+           'qmGv//gg452DJGIz1q9siw=='
+         ],
+         tracking_data:"tracking data",
+         type:"text",
+         text:` ( ${formattedDate} ) ${mainMessage}`
+      }
+      axios({
+        method: 'post',
+        url: 'https://chatapi.viber.com/pa/broadcast_message',
+        data: {
+          dataSend
+        }
+      });
+    }
 })
 
 const port = 3000
