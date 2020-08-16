@@ -25,21 +25,27 @@ const server = http.createServer(function(request, response) {
         body += chunk.toString();
     });
     request.on('end', () => {
-        console.log(
-            parse(body)
-        );
+        // console.log(
+        //     parse(body)
+        // );
         Resend(parse(body));
         response.end('ok');
     });
+  }
+});
 
     function Resend(data){
+      console.log(data);
       let url = "https://chatapi.viber.com/pa/broadcast_message";
-      var mainMessage
+      var mainMessage;
+      var corruptedProducts = data.products;
+      var fixedProducts = corrupted.replace(/[!<br> ]/g, "");
+      console.log(fixed)
 
       if(data.selfvinos===true){
-        mainMessage = `${data.total_price}(грн) | ${data.products} | Тел: ${data.telephone} |  Доставка : ${data.input_address}, ${data.input_city}, ${data.input_state} | ${data.notcall} -> ${data.security}`;
+        mainMessage = `${data.total_price}(грн) | ${fixedProducts} | Тел: ${data.telephone} |  Доставка : ${data.input_address}, ${data.input_city}, ${data.input_state} | ${data.notcall} -> ${data.security}`;
       }else{
-        mainMessage = `Kліент забире сам: ${data.total_price}(грн) | ${data.products} | Тел: ${data.telephone} | ${data.notcall} | -> ${data.security}`;
+        mainMessage = `Kліент забире сам: ${data.total_price}(грн) | ${fixedProducts} | Тел: ${data.telephone} | ${data.notcall} | -> ${data.security}`;
       }
 
       var currentdate = new Date();
@@ -54,7 +60,7 @@ const server = http.createServer(function(request, response) {
       var dataSend = {
         auth_token:"",
          receiver: "GoHi3E4bJK5s1Ldhx24eLQ==",
-         min_api_version":1,
+         min_api_version :1,
          sender:{
             name:"sushiPanda",
             avatar:"https://sushipandabc.com.ua/img/logo.png"
@@ -72,12 +78,10 @@ const server = http.createServer(function(request, response) {
       axios({
         method: 'post',
         url: 'https://chatapi.viber.com/pa/broadcast_message',
-        data: {
-          dataSend
-        }
+        data:dataSend
       });
     }
-})
+
 
 const port = 3000
 const host = '127.0.0.1'
