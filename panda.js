@@ -1,6 +1,8 @@
 const http = require('http')
 const { parse } = require('querystring');
 const axios = require('axios');
+const PassPage = require('./passPage')
+const FailPage = require('./failPage')
 
 const server = http.createServer(function(request, response) {
   console.dir(request.param)
@@ -29,8 +31,11 @@ const server = http.createServer(function(request, response) {
         //     parse(body)
         // );
         Resend(parse(body));
-        response.end('ok');
+        var pass = PassPage('https://sushipandabc.com.ua');
+        response.end(pass);
     });
+  }else{
+    console.log("Request fail");
   }
 });
 
@@ -39,8 +44,8 @@ const server = http.createServer(function(request, response) {
       let url = "https://chatapi.viber.com/pa/broadcast_message";
       var mainMessage;
       var corruptedProducts = data.products;
-      var fixedProducts = corrupted.replace(/[!<br> ]/g, "");
-      console.log(fixed)
+      var fixedProducts = corruptedProducts.replace(/[!<br> ]/g, "");
+      console.log(fixedProducts)
 
       if(data.selfvinos===true){
         mainMessage = `${data.total_price}(грн) | ${fixedProducts} | Тел: ${data.telephone} |  Доставка : ${data.input_address}, ${data.input_city}, ${data.input_state} | ${data.notcall} -> ${data.security}`;
