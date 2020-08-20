@@ -5,57 +5,45 @@ const PassPage = require('./passPage')
 const FailPage = require('./failPage')
 
 const server = http.createServer(function(request, response) {
-  if (request.method == 'POST') {
-    console.log('POST')
-    var body = ''
-    request.on('data', function(data) {
-	body += data;
-    //   console.log('Partial body: ' + body)
-     })
-     request.on('end', function() {
-  //     console.log('Body: ' + body);
-	Resend(body);
-       response.writeHead(200, {'Content-Type': 'text/html'});
-       response.end('post received');
-     })
-  }
+  // if (request.method == 'POST') {
+  //   console.log('POST')
+  //   var body = ''
+  //   request.on('data', function(data) {
+  //     body += data
+  //     console.log('Partial body: ' + body)
+  //   })
+  //   request.on('end', function() {
+  //     console.log('Body: ' + body)
+  //     response.writeHead(200, {'Content-Type': 'text/html'})
+  //     response.end('post received')
+  //   })
+  // }
 
-//  if (request.method === 'POST') {
-//    let body = '';
-//    request.on('data', chunk => {
-//        body += chunk.toString();
-//console.log(body+" "+typeof(body));
+  if (request.method === 'POST') {
+    let body = '';
 
-//    });
-//    request.on('end', () => {
-//      var obj = JSON.parse(body)
-//      console.log(obj);
-//      Resend(obj);
+    request.on('end', () => {
+      var obj = JSON.parse(body)
+      console.log(obj);
+      Resend(obj);
       // console.log(parse(body));
       // var pass = PassPage('https://pizzapandabc.com.ua');
-//      response.end(obj);
-//    });
-//  } else {
-//    console.log("Request fail");
-//  }
+      response.end(obj);
+    });
+  } else {
+    console.log("Request fail");
+  }
 });
 
-function Resend(datax) {
-//  console.log(typeof(datax));
+function Resend(data) {
+  console.log(data);
   let url = "https://chatapi.viber.com/pa/broadcast_message";
-  var mainProducts="";
+  var mainProducts;
   var mainMessage;
-var data = JSON.parse(datax);
-//console.log(data.products);
-var arrayProducts = [];
-arrayProducts=data.products;
-console.log(arrayProducts)
- arrayProducts.map((product)=>{
-console.log(product.name +" This is Product! ");
-    var total = product.currentprice * product.quantity;
-    mainProducts +=`${product.name} ${product.size} ${product.currentprice} = (${total})`;
+  data.products.forEach((product)=>{
+    let total = product.currentprice*product.quantity;
+    mainProducts+=`${product.name}-${product.size}-${product.currentprice}=(${total}) ${product.icon}`;
   })
-
     // currentprice: 135,
     // lastprice: 0,
     // description: 'соус Пілатті, сир Моцарелла, салямі, мисливські ковбаски, шинка, баварські ковбаски, цибуля.',
@@ -68,7 +56,7 @@ console.log(product.name +" This is Product! ");
     // size: '30cm',
     // date: '2020-08-20T16:39:56.391Z'
 
-  mainMessage = `${mainProducts}| Tel:${data.delivery.yourtell} (${data.delivery.yourname}) |  ${data.delivery.pickup}, ${data.delivery.address}, ${data.delivery.housenum} | ${data.delivery.additionalinfo} `;
+  mainMessage = `${mainProducts}| Тел:${data.delivery.yourtell} (${data.delivery.yourname}) |  ${data.delivery.pickup}, ${data.delivery.address}, ${data.delivery.housenum} | ${data.delivery.additionalinfo} `;
 
   var currentdate = new Date();
   var datetime = "Замовлення: " + currentdate.getDate() + "/" +
