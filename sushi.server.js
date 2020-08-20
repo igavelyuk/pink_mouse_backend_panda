@@ -47,7 +47,7 @@ const server = http.createServer(function(request, response) {
       var fixedProducts = corruptedProducts.replace(/[!<br> ]/g, "");
       console.log(fixedProducts)
 
-      if(data.self_vinos==='true'){
+      if(data.self_vinos==='false'){
         mainMessage = `${data.total_price}(грн) | ${fixedProducts} | Тел: ${data.telephone} |  Доставка : ${data.input_address}, ${data.input_city}, ${data.input_state} | ${data.notcall} -> ${data.security}`;
       }else{
         mainMessage = `Kліент забире сам: ${data.total_price}(грн) | ${fixedProducts} | Тел: ${data.telephone} | ${data.notcall} | -> ${data.security}`;
