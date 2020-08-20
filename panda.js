@@ -47,7 +47,7 @@ const server = http.createServer(function(request, response) {
       var fixedProducts = corruptedProducts.replace(/[!<br> ]/g, "");
       console.log(fixedProducts)
 
-      if(data.selfvinos===true){
+      if(data.self_vinos===true){
         mainMessage = `${data.total_price}(грн) | ${fixedProducts} | Тел: ${data.telephone} |  Доставка : ${data.input_address}, ${data.input_city}, ${data.input_state} | ${data.notcall} -> ${data.security}`;
       }else{
         mainMessage = `Kліент забире сам: ${data.total_price}(грн) | ${fixedProducts} | Тел: ${data.telephone} | ${data.notcall} | -> ${data.security}`;
@@ -63,7 +63,7 @@ const server = http.createServer(function(request, response) {
       let formattedDate = datetime;
 
       var dataSend = {
-        auth_token:"",
+        auth_token:"4a7216e26c67d415-ee9b9e0516c17072-8c4d4593f08670fe",
          receiver: "GoHi3E4bJK5s1Ldhx24eLQ==",
          min_api_version :1,
          sender:{
