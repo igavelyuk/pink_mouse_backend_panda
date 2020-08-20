@@ -1,11 +1,11 @@
 const http = require('http')
-const { parse } = require('querystring');
+const {parse} = require('querystring');
 const axios = require('axios');
 const PassPage = require('./passPage')
 const FailPage = require('./failPage')
 
 const server = http.createServer(function(request, response) {
-  console.dir(request.param)
+  console.log(request.param)
 
   // if (request.method == 'POST') {
   //   console.log('POST')
@@ -24,67 +24,76 @@ const server = http.createServer(function(request, response) {
   if (request.method === 'POST') {
     let body = '';
     request.on('data', chunk => {
-        body += chunk.toString();
+      body += chunk.toString();
     });
     request.on('end', () => {
-        // console.log(
-        //     parse(body)
-        // );
-        Resend(parse(body));
-        var pass = PassPage('https://pizzapandabc.com.ua');
-        response.end(pass);
+      var obj = JSON.parse(body)
+      //console.log(obj);
+      Resend(obj);
+      // console.log(parse(body));
+      // var pass = PassPage('https://pizzapandabc.com.ua');
+      response.end(obj);
     });
-  }else{
+  } else {
     console.log("Request fail");
   }
 });
 
-    function Resend(data){
-      console.log(data);
-      let url = "https://chatapi.viber.com/pa/broadcast_message";
-      var mainMessage;
-      var corruptedProducts = data.products;
-      var fixedProducts = corruptedProducts.replace(/[!<br> ]/g, "");
-      console.log(fixedProducts)
+function Resend(data) {
+  console.log(data);
+  let url = "https://chatapi.viber.com/pa/broadcast_message";
+  var mainProducts;
+  var mainMessage;
+  data.products.forEach((product)=>{
+    let total = product.currentprice*product.quantity;
+    mainProducts+=`${product.name}-${product.size}-${product.currentprice}=(${total}) ${product.icon}`;
+  })
+    // currentprice: 135,
+    // lastprice: 0,
+    // description: 'соус Пілатті, сир Моцарелла, салямі, мисливські ковбаски, шинка, баварські ковбаски, цибуля.',
+    // icon: 'https://firebasestorage.googleapis.com/v0/b/pizzapanda-cad4c.appspot.com/o/Pictures%2F4meat.jpg?alt=media&token=8ba49eff-72dc-41d2-85f2-1742668eaeff',
+    // id: '5acc4449-9c57-4c0d-8505-984f2d4bcff9',
+    // name: '4 Мяса',
+    // picture: 'https://firebasestorage.googleapis.com/v0/b/pizzapanda-cad4c.appspot.com/o/p%2F4meat.webp?alt=media&token=9825864b-c696-47ac-95d1-cc690fa299f4',
+    // promo: false,
+    // quantity: 1,
+    // size: '30cm',
+    // date: '2020-08-20T16:39:56.391Z'
 
-      if(data.self_vinos==='false'){
-        mainMessage = `${data.total_price}(грн) | ${fixedProducts} | Тел: ${data.telephone} |  Доставка : ${data.input_address}, ${data.input_city}, ${data.input_state} | ${data.notcall} -> ${data.security}`;
-      }else{
-        mainMessage = `Kліент забире сам: ${data.total_price}(грн) | ${fixedProducts} | Тел: ${data.telephone} | ${data.notcall} | -> ${data.security}`;
-      }
+  mainMessage = `${mainProducts}| Тел:${data.delivery.yourtell} (${data.delivery.yourname}) |  ${data.delivery.pickup}, ${data.delivery.address}, ${data.delivery.housenum} | ${data.delivery.additionalinfo} `;
 
-      var currentdate = new Date();
-      var datetime = "Замовлення: " + currentdate.getDate() + "/"
-                + (currentdate.getMonth()+1)  + "/"
-                + currentdate.getFullYear() + " @ "
-                + currentdate.getHours() + ":"
-                + currentdate.getMinutes() + ":"
-                + currentdate.getSeconds();
-      let formattedDate = datetime;
+  var currentdate = new Date();
+  var datetime = "Замовлення: " + currentdate.getDate() + "/" +
+    (currentdate.getMonth() + 1) + "/" +
+    currentdate.getFullYear() + " @ " +
+    currentdate.getHours() + ":" +
+    currentdate.getMinutes() + ":" +
+    currentdate.getSeconds();
+  let formattedDate = datetime;
 
-      var dataSend = {
-        auth_token:"4aaf0fa9fc67d6b6-b94b6c7e6ff45df6-59e9dc7ae9aa80c1",
-         receiver: "7HxXhTO85Ws/8c8W/L3T1g==",
-         min_api_version :1,
-         sender:{
-            name:"Піцца Панда",
-            avatar:"https://pizzapandabc.com.ua/img/icons/favicon-32x32.png"
-         },
-         broadcast_list:[
-           "TCCxdJo6rbUtJUEp5ms0ow==",
-           "7HxXhTO85Ws/8c8W/L3T1g==",
-           "DLE2ERqX8BKFFBCVGwsM7A=="
-         ],
-         tracking_data:"tracking data",
-         type:"text",
-         text:` ( ${formattedDate} ) ${mainMessage}`
-      }
-      axios({
-        method: 'post',
-        url: 'https://chatapi.viber.com/pa/broadcast_message',
-        data:dataSend
-      });
-    }
+  var dataSend = {
+    auth_token: "4aaf0fa9fc67d6b6-b94b6c7e6ff45df6-59e9dc7ae9aa80c1",
+    receiver: "7HxXhTO85Ws/8c8W/L3T1g==",
+    min_api_version: 1,
+    sender: {
+      name: "Піцца Панда",
+      avatar: "https://pizzapandabc.com.ua/img/icons/favicon-32x32.png"
+    },
+    broadcast_list: [
+      "TCCxdJo6rbUtJUEp5ms0ow==",
+      "7HxXhTO85Ws/8c8W/L3T1g==",
+      "DLE2ERqX8BKFFBCVGwsM7A=="
+    ],
+    tracking_data: "tracking data",
+    type: "text",
+    text: ` ( ${formattedDate} ) ${mainMessage}`
+  }
+  axios({
+    method: 'post',
+    url: 'https://chatapi.viber.com/pa/broadcast_message',
+    data: dataSend
+  });
+}
 
 
 const port = 3003
